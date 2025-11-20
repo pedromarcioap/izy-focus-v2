@@ -11,7 +11,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         // Notify user
         chrome.notifications.create({
           type: 'basic',
-          iconUrl: 'icon.png', // Ensure you have a placeholder icon or remove this line
+          iconUrl: 'icons/icon.png',
           title: 'Izy Focus',
           message: session.state === SessionState.FOCUS 
             ? 'Ciclo de foco concluído! Hora de regar sua planta.' 

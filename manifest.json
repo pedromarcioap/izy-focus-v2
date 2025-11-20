@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Izy Focus - TDAH & Produtividade",
+  "version": "1.0",
+  "description": "Extensão de foco gamificada para reduzir carga cognitiva.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Izy Focus"
+  },
+  "background": {
+    "service_worker": "background.ts"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

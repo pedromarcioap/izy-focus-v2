@@ -12,6 +12,7 @@ import { storage } from './utils/storage';
 
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>(View.POPUP);
   const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
 
@@ -23,21 +24,26 @@ const App: React.FC = () => {
   // Load data from chrome storage on mount
   useEffect(() => {
     const loadData = async () => {
-      const data = await storage.getData();
-      setFocusLists(data.focusLists);
-      setBlockLists(data.blockLists);
-      setGarden(data.garden);
-      setStats(data.stats);
-      
-      if (data.activeSession) {
-        setActiveSession(data.activeSession);
-        if (data.activeSession.state === SessionState.BREAK) {
-           setCurrentView(View.BREAK);
-        } else {
-           setCurrentView(View.ACTIVE_FOCUS);
+      try {
+        const data = await storage.getData();
+        setFocusLists(data.focusLists);
+        setBlockLists(data.blockLists);
+        setGarden(data.garden);
+        setStats(data.stats);
+        
+        if (data.activeSession) {
+          setActiveSession(data.activeSession);
+          if (data.activeSession.state === SessionState.BREAK) {
+             setCurrentView(View.BREAK);
+          } else {
+             setCurrentView(View.ACTIVE_FOCUS);
+          }
         }
+        setIsLoaded(true);
+      } catch (error) {
+        console.error("Critical error loading app:", error);
+        setLoadError("Erro ao carregar dados. Verifique o console.");
       }
-      setIsLoaded(true);
     };
     loadData();
   }, []);
@@ -160,8 +166,6 @@ const App: React.FC = () => {
       if (!activeSession) return;
 
       // Logic: If it's NOT prep time, it's a penalty.
-      // We use !== PREP instead of === FOCUS to catch any edge case where state is numeric 2 vs string "FOCUS"
-      // and to align with the UI logic.
       const isPrep = activeSession.state === SessionState.PREP;
 
       if (!isPrep) {
@@ -188,8 +192,28 @@ const App: React.FC = () => {
       setCurrentView(View.POPUP);
   }, [activeSession, garden, stats]);
 
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full bg-slate-900 text-white p-6 text-center">
+        <p className="text-red-400 text-lg font-bold mb-2">Ops! Algo deu errado.</p>
+        <p className="text-sm text-slate-400">{loadError}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-slate-700 rounded hover:bg-slate-600"
+        >
+          Tentar Novamente
+        </button>
+      </div>
+    );
+  }
+
   if (!isLoaded) {
-      return <div className="flex items-center justify-center h-full bg-slate-900 text-white">Carregando...</div>;
+      return (
+        <div className="flex flex-col items-center justify-center h-full bg-slate-900 text-slate-200 p-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
+          <p className="font-semibold">Carregando Izy Focus...</p>
+        </div>
+      );
   }
 
   const renderView = () => {

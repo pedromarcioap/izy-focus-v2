@@ -1,9 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Izy Focus</title>
+  <!-- 
+    NOTE FOR CHROME EXTENSIONS: 
+    External scripts like Tailwind CDN or the Import Map below will be blocked by Content Security Policy (CSP) 
+    in a packed extension (Manifest V3). To run this as a real extension, you must bundle these dependencies locally 
+    (e.g., using Vite/Webpack) or download the JS files and include them in the assets folder. 
+  -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,11 +18,10 @@
   <style>
     body {
       font-family: 'Figtree', sans-serif;
-      background-color: #0F172A;
-      color: #E2E8F0;
+      background-color: #0F172A; /* Fallback background */
+      color: #E2E8F0; /* Fallback text color */
       margin: 0;
       padding: 0;
-      /* Ensure min dimensions for extension popup, but allow flexibility */
       min-width: 350px; 
       min-height: 500px;
       width: 100%;
@@ -25,6 +31,12 @@
     #root {
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    /* Ensure basic visibility if Tailwind fails loading */
+    button {
+        cursor: pointer;
     }
   </style>
 <script type="importmap">

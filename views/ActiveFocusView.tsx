@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { SessionState } from '../types'; // Import SessionState enum
+import { SessionState } from '../types';
 import type { FocusSession } from '../types';
 import { useTimer } from '../hooks/useTimer';
 import { PlantIcon } from '../components/icons/PlantIcon';
@@ -14,9 +13,8 @@ interface ActiveFocusViewProps {
 }
 
 export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, onComplete, onExtend, onGiveUp }) => {
-  // Timer is now driven by the session.endTime stored timestamp, not an internal start/stop
   const { timeLeftFormatted, secondsLeft } = useTimer(session.endTime);
-  const [isConfirmingGiveUp, setIsConfirmingGiveUp] = useState(false);
+  const [confirmGiveUp, setConfirmGiveUp] = useState(false);
 
   useEffect(() => {
     if (secondsLeft <= 0) {
@@ -26,56 +24,79 @@ export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, onCom
 
   const totalSeconds = (session.endTime - session.startTime) / 1000;
   const growthPercentage = 1 - (secondsLeft / totalSeconds);
-  
   const isPrep = session.state === SessionState.PREP;
 
-  const handleGiveUpClick = () => {
-    if (isPrep) {
-        // No penalty in prep, just do it
-        onGiveUp();
-    } else {
-        // In focus mode, ask for confirmation inside the UI
-        setIsConfirmingGiveUp(true);
-    }
-  };
-
   return (
-    <div className={`p-8 flex flex-col h-full justify-between items-center text-center transition-colors duration-500 w-full`}
-        style={{backgroundColor: isPrep ? '#4f3b11' : '#0F172A'}}>
-      <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-         <PlantIcon growth={growthPercentage} className="w-96 h-96 absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 text-slate-800 opacity-30" />
-      </div>
+    <div className="view-scroll no-nav items-center justify-center animate-in relative overflow-hidden" style={{paddingBottom: '20px'}}>
       
-      <header className="z-10 w-full">
-         <p className="text-2xl font-semibold" style={{color: isPrep ? '#F59E0B' : '#E2E8F0'}}>
-            {isPrep ? "Prepare-se..." : session.list.name}
-         </p>
-         {!isPrep && <p className="text-slate-500 text-sm mt-1">Mantenha o foco para sua planta crescer</p>}
-      </header>
+      {/* Background Ambient Plant - Inline styles for safety */}
+      <div 
+        className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+        style={{ 
+            position: 'absolute', 
+            top: 0, left: 0, right: 0, bottom: 0, 
+            zIndex: 0,
+            opacity: 0.2 
+        }}
+      >
+        <div style={{ width: '100%', height: '100%', transform: 'scale(1.5)', filter: 'blur(4px)' }}>
+            <PlantIcon growth={growthPercentage} className="w-full h-full opacity-30" />
+        </div>
+      </div>
 
-      <main className="z-10 flex flex-col items-center justify-center flex-grow">
-        <h1 className="text-7xl sm:text-8xl font-bold tracking-tighter" style={{color: isPrep ? '#F59E0B' : '#E2E8F0'}}>
-          {timeLeftFormatted}
-        </h1>
-      </main>
+      {/* Top Meta */}
+      <div className="relative z-10 flex flex-col items-center mt-4">
+        <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-2 ${isPrep ? 'text-warning bg-warning/10' : 'text-primary bg-primary-dim'}`}>
+            {isPrep ? "Preparando" : "Modo Foco"}
+        </div>
+        <h2 className="text-sm text-muted font-medium">{session.list.name}</h2>
+      </div>
 
-      <footer className="z-10 w-full max-w-xs space-y-3 mb-4">
-        {secondsLeft <= 0 ? (
-             <Button onClick={onExtend} variant="secondary">Continuar (+15 min)</Button>
-        ) : isConfirmingGiveUp ? (
-            <div className="space-y-2 animate-fade-in">
-                <p className="text-red-400 font-bold text-sm mb-2">Sua planta vai murchar. Tem certeza?</p>
-                <div className="flex space-x-2">
-                    <Button onClick={() => setIsConfirmingGiveUp(false)} variant="ghost" className="text-slate-300 bg-slate-800">Voltar</Button>
-                    <Button onClick={onGiveUp} className="bg-red-600 hover:bg-red-700 text-white">Sim, Desistir</Button>
-                </div>
-            </div>
-        ) : (
-            <Button onClick={handleGiveUpClick} variant="ghost" className={`text-sm w-full ${isPrep ? 'text-slate-400 hover:text-white' : 'text-red-400 hover:text-red-300 hover:bg-red-900/20'}`}>
-                {isPrep ? "Cancelar" : "Desistir (Matar Planta)"}
-            </Button>
+      {/* Main Timer */}
+      <div className="relative z-20 text-center my-auto">
+        <h1 className="timer-huge">{timeLeftFormatted}</h1>
+        
+        {!isPrep && !confirmGiveUp && (
+           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mt-4">
+             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+             <span className="text-xs text-white tracking-wide opacity-80">Cultivando planta</span>
+           </div>
         )}
-      </footer>
+      </div>
+
+      {/* Controls Layer */}
+      <div className="w-full z-20 flex flex-col gap-3 mt-auto">
+        
+        {secondsLeft <= 0 ? (
+           <Button size="lg" onClick={onExtend} className="animate-pulse shadow-lg">
+             Continuar (+15m)
+           </Button>
+        ) : 
+        
+        confirmGiveUp ? (
+           <div className="card border-danger bg-black/90 flex flex-col gap-4 text-center animate-in backdrop-blur-xl">
+             <div>
+                <p className="text-danger font-bold text-sm uppercase tracking-wide">Cuidado</p>
+                <p className="text-sm text-muted mt-1">Sua planta irá murchar se parar agora.</p>
+             </div>
+             <div className="flex gap-3">
+               <Button size="sm" variant="ghost" onClick={() => setConfirmGiveUp(false)} className="flex-1">Voltar</Button>
+               <Button size="sm" variant="danger" onClick={onGiveUp} className="flex-1">Desistir</Button>
+             </div>
+           </div>
+        ) : 
+        
+        (
+           <Button 
+             variant="ghost"
+             size="sm"
+             onClick={() => isPrep ? onGiveUp() : setConfirmGiveUp(true)} 
+             className="text-xs opacity-50 hover:opacity-100 border-none"
+           >
+             {isPrep ? "CANCELAR" : "DESISTIR"}
+           </Button>
+        )}
+      </div>
     </div>
   );
 };

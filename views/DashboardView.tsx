@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import type { GardenPlant, CycleStat } from '../types';
 import { getAIInsights } from '../services/geminiService';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { PlantIcon } from '../components/icons/PlantIcon';
 
 interface DashboardViewProps {
@@ -10,91 +10,89 @@ interface DashboardViewProps {
   stats: CycleStat[];
 }
 
-const ChartCard: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => (
-    <div className="bg-slate-800 p-4 rounded-xl">
-        <h3 className="font-semibold text-slate-200 mb-4">{title}</h3>
-        <div className="h-48">
-            {children}
-        </div>
-    </div>
-);
-
 export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) => {
-    const [insight, setInsight] = useState<string>('Analisando seu progresso...');
-    const [isLoadingInsight, setIsLoadingInsight] = useState(true);
-
+    const [insight, setInsight] = useState<string>('Conectando com a natureza...');
+    
     const alivePlants = garden.filter(p => p.status === 'alive');
     const witheredPlants = garden.filter(p => p.status === 'withered');
 
     useEffect(() => {
         const fetchInsight = async () => {
-            setIsLoadingInsight(true);
-            const newInsight = await getAIInsights(stats);
-            setInsight(newInsight);
-            setIsLoadingInsight(false);
+            if (stats.length > 0) {
+                const newInsight = await getAIInsights(stats);
+                setInsight(newInsight);
+            } else {
+                setInsight("Complete seu primeiro ciclo para receber insights.");
+            }
         };
         fetchInsight();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stats]);
 
     return (
-        <div className="p-6 h-full overflow-y-auto animate-fade-in">
-            <h1 className="text-3xl font-bold text-slate-100 mb-2">Seu Jardim</h1>
-            <p className="text-slate-400 mb-6">Veja como seu foco cresceu.</p>
-
-            <div className="bg-slate-800 p-4 rounded-xl mb-6">
-                <h3 className="font-semibold text-slate-200 mb-2">Plantas Cultivadas ({alivePlants.length})</h3>
-                <div className="flex flex-wrap gap-4 max-h-40 overflow-y-auto">
-                    {alivePlants.map(plant => (
-                        <div key={plant.id} className="flex flex-col items-center">
-                            <PlantIcon growth={1} status="alive" className="w-12 h-12" />
-                            <span className="text-[10px] text-slate-500 mt-1">{plant.date.substring(5)}</span>
-                        </div>
-                    ))}
-                    {alivePlants.length === 0 && <p className="text-slate-500 text-sm italic">Complete um ciclo para plantar.</p>}
+        <div className="page-container animate-in pb-20">
+            <h1 className="title-hero">Jardim</h1>
+            
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="card-glass flex flex-col items-center justify-center p-4 bg-primary/5 border-primary/20">
+                    <span className="text-3xl font-bold text-primary">{alivePlants.length}</span>
+                    <span className="text-xs text-muted uppercase tracking-wider mt-1">Vivas</span>
                 </div>
-                
-                {witheredPlants.length > 0 && (
-                    <div className="mt-6 border-t border-slate-700 pt-4">
-                        <h3 className="font-semibold text-slate-400 mb-2 text-sm">Plantas Murchas (Desistências)</h3>
-                        <div className="flex flex-wrap gap-4">
-                            {witheredPlants.map(plant => (
-                                <div key={plant.id} className="flex flex-col items-center opacity-70">
-                                    <PlantIcon growth={1} status="withered" className="w-10 h-10" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                <div className="card-glass flex flex-col items-center justify-center p-4 bg-white/5">
+                    <span className="text-3xl font-bold text-white opacity-50">{witheredPlants.length}</span>
+                    <span className="text-xs text-muted uppercase tracking-wider mt-1">Murchas</span>
+                </div>
             </div>
 
-            <div className="space-y-6">
-                 <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 rounded-xl shadow-lg">
-                    <h3 className="font-bold text-white mb-2 text-sm uppercase tracking-wide">Coach IA</h3>
-                    {isLoadingInsight ? 
-                        <div className="space-y-2">
-                            <div className="h-2 bg-white/20 rounded w-3/4 animate-pulse"></div>
-                            <div className="h-2 bg-white/20 rounded w-1/2 animate-pulse"></div>
-                        </div> :
-                        <p className="text-white text-sm leading-relaxed italic">"{insight}"</p>
-                    }
+            {/* Garden Grid */}
+            <div className="mb-6">
+                <span className="text-label mb-2 px-1">Sua Coleção</span>
+                <div className="grid grid-cols-4 gap-2 p-3 rounded-xl bg-black/20 border border-dim max-h-48 overflow-y-auto">
+                    {alivePlants.map(plant => (
+                        <div key={plant.id} className="aspect-square flex justify-center items-center bg-white/5 rounded-lg border border-white/5 hover:border-primary/30 transition-colors">
+                            <PlantIcon growth={1} status="alive" className="w-8 h-8 drop-shadow-lg" />
+                        </div>
+                    ))}
+                    {garden.length === 0 && (
+                        <div className="col-span-4 py-8 text-center">
+                            <p className="text-sm text-muted opacity-60">Seu jardim está esperando a primeira semente.</p>
+                        </div>
+                    )}
                 </div>
+            </div>
 
-                <ChartCard title="Histórico de Ciclos">
+            {/* AI Insight */}
+             <div className="card-glass mb-6 border-l-4 border-l-emerald-500 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" /></svg>
+                </div>
+                <p className="text-xs uppercase font-bold text-emerald-400 mb-2 tracking-wide">Insight da IA</p>
+                <p className="text-sm text-white opacity-90 leading-relaxed italic">"{insight}"</p>
+            </div>
+
+            {/* Chart */}
+            <div className="h-48 mt-auto">
+               <span className="text-label mb-2 px-1">Performance Semanal</span>
+               <div className="w-full h-full card-glass p-2">
                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stats} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                        <XAxis dataKey="date" tick={{ fill: '#94A3B8' }} fontSize={10} tickFormatter={(val) => val.substring(5)} />
-                        <YAxis tick={{ fill: '#94A3B8' }} fontSize={10} allowDecimals={false} />
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #334155', color: '#F1F5F9' }} 
-                            labelStyle={{ color: '#94A3B8' }}
+                        <BarChart data={stats}>
+                        <XAxis 
+                            dataKey="date" 
+                            tick={{ fill: '#71717a', fontSize: 9 }} 
+                            tickFormatter={(val) => val.substring(5)} 
+                            axisLine={false} 
+                            tickLine={false} 
                         />
-                        <Bar dataKey="completed" name="Completos" fill="#10B981" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="interrupted" name="Interrompidos" fill="#64748B" radius={[4, 4, 0, 0]} />
+                        <Tooltip 
+                            cursor={{fill: 'rgba(255,255,255,0.05)'}} 
+                            contentStyle={{ backgroundColor: '#09090b', border: '1px solid #333', borderRadius: '8px', color: '#fff' }} 
+                        />
+                        <Bar dataKey="completed" fill="#34d399" radius={[4, 4, 0, 0]} stackId="a" />
+                        <Bar dataKey="interrupted" fill="#3f3f46" radius={[4, 4, 0, 0]} stackId="a" />
                         </BarChart>
                     </ResponsiveContainer>
-                </ChartCard>
+               </div>
             </div>
         </div>
     );

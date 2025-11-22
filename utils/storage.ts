@@ -1,6 +1,6 @@
 
-import type { FocusList, BlockList, GardenPlant, CycleStat, FocusSession } from '../types';
-import { INITIAL_BLOCK_LISTS, INITIAL_FOCUS_LISTS, INITIAL_GARDEN, INITIAL_STATS } from '../constants';
+import type { FocusList, BlockList, GardenPlant, CycleStat, FocusSession, UserSettings } from '../types';
+import { INITIAL_BLOCK_LISTS, INITIAL_FOCUS_LISTS, INITIAL_GARDEN, INITIAL_STATS, DEFAULT_SETTINGS } from '../constants';
 
 declare var chrome: any;
 
@@ -78,13 +78,14 @@ const setStorage = (items: any): Promise<void> => {
 export const storage = {
   getData: async () => {
     try {
-      const data = await getStorage(['focusLists', 'blockLists', 'garden', 'stats', 'activeSession']);
+      const data = await getStorage(['focusLists', 'blockLists', 'garden', 'stats', 'activeSession', 'settings']);
       return {
         focusLists: (data.focusLists as FocusList[]) || INITIAL_FOCUS_LISTS,
         blockLists: (data.blockLists as BlockList[]) || INITIAL_BLOCK_LISTS,
         garden: (data.garden as GardenPlant[]) || INITIAL_GARDEN,
         stats: (data.stats as CycleStat[]) || INITIAL_STATS,
         activeSession: (data.activeSession as FocusSession | null) || null,
+        settings: (data.settings as UserSettings) || DEFAULT_SETTINGS,
       };
     } catch (error) {
       console.error("Failed to load data from storage", error);
@@ -95,6 +96,7 @@ export const storage = {
         garden: INITIAL_GARDEN,
         stats: INITIAL_STATS,
         activeSession: null,
+        settings: DEFAULT_SETTINGS,
       };
     }
   },

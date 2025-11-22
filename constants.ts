@@ -1,5 +1,5 @@
 
-import type { FocusList, BlockList, GardenPlant, CycleStat } from './types';
+import type { FocusList, BlockList, GardenPlant, CycleStat, UserSettings, AudioTrack } from './types';
 
 export const COLORS = {
   darkNavy: '#0F172A',
@@ -50,3 +50,29 @@ export const MICRO_BREAK_SUGGESTIONS = [
     "Respire fundo 5 vezes (inspire 4s, expire 4s)",
     "Dê uma volta rápida pelo ambiente",
 ];
+
+// --- Audio Assets ---
+// Using reliable CDN links for demo purposes. In production, these would be local assets.
+export const NOTIFICATION_SOUNDS: AudioTrack[] = [
+    { id: 'bell', name: 'Sino Zen', url: 'https://cdn.freesound.org/previews/339/339816_5121236-lq.mp3' },
+    { id: 'chime', name: 'Carrilhão Suave', url: 'https://cdn.freesound.org/previews/352/352651_4019029-lq.mp3' },
+    { id: 'success', name: 'Sucesso Digital', url: 'https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3' },
+    { id: 'none', name: 'Silencioso', url: '' }
+];
+
+export const FOCUS_MUSIC_TRACKS: AudioTrack[] = [
+    { id: 'brown', name: 'Brown Noise (Profundo)', url: 'https://cdn.pixabay.com/download/audio/2022/11/03/audio_c9937f643d.mp3' },
+    { id: 'white', name: 'White Noise (Foco)', url: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_0555827922.mp3' },
+    { id: 'alpha', name: 'Ondas Alpha (Relax)', url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3' },
+    { id: 'rain', name: 'Chuva Suave', url: 'https://cdn.pixabay.com/download/audio/2022/02/15/audio_bd1c5d8f5d.mp3' },
+    { id: 'lofi', name: 'Lo-Fi Study', url: 'https://cdn.pixabay.com/download/audio/2022/05/05/audio_132476e3c5.mp3' }
+];
+
+export const DEFAULT_SETTINGS: UserSettings = {
+    notificationTitleFocus: "Ciclo Concluído!",
+    notificationTitleBreak: "Hora de Voltar!",
+    notificationSound: 'bell',
+    focusMusicEnabled: false,
+    focusMusicTrack: 'brown',
+    focusMusicVolume: 0.5
+};

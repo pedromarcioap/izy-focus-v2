@@ -50,3 +50,18 @@ export interface GardenPlant {
   date: string;
   status: 'alive' | 'withered';
 }
+
+export interface AudioTrack {
+  id: string;
+  name: string;
+  url: string;
+}
+
+export interface UserSettings {
+  notificationTitleFocus: string;
+  notificationTitleBreak: string;
+  notificationSound: string; // ID of the track
+  focusMusicEnabled: boolean;
+  focusMusicTrack: string; // ID of the track
+  focusMusicVolume: number; // 0.0 to 1.0
+}

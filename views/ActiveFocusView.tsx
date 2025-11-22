@@ -1,35 +1,87 @@
+
 import React, { useEffect, useState } from 'react';
 import { SessionState } from '../types';
-import type { FocusSession } from '../types';
+import type { FocusSession, UserSettings } from '../types';
 import { useTimer } from '../hooks/useTimer';
 import { PlantIcon } from '../components/icons/PlantIcon';
 import { Button } from '../components/common/Button';
+import { FOCUS_MUSIC_TRACKS } from '../constants';
 
 interface ActiveFocusViewProps {
   session: FocusSession;
+  settings: UserSettings;
   onComplete: () => void;
   onExtend: () => void;
   onGiveUp: () => void;
 }
 
-export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, onComplete, onExtend, onGiveUp }) => {
+declare var chrome: any;
+
+const safelySendMessage = (message: any) => {
+  if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+    try {
+      chrome.runtime.sendMessage(message);
+    } catch (e) {
+      console.warn("Failed to send message to extension background:", e);
+    }
+  } else {
+    // Fallback for dev environment
+    console.log("[Mock SendMessage]:", message);
+  }
+};
+
+export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, settings, onComplete, onExtend, onGiveUp }) => {
   const { timeLeftFormatted, secondsLeft } = useTimer(session.endTime);
   const [confirmGiveUp, setConfirmGiveUp] = useState(false);
 
+  const isPrep = session.state === SessionState.PREP;
+  const isFocus = session.state === SessionState.FOCUS;
+
+  // --- Music Logic (Offscreen Delegation) ---
+  useEffect(() => {
+    // Only attempt to play music if we are officially in focus mode.
+    // We removed secondsLeft from dependencies to avoid spamming the background script every second.
+    if (settings.focusMusicEnabled && isFocus) {
+        const track = FOCUS_MUSIC_TRACKS.find(t => t.id === settings.focusMusicTrack);
+        if (track && track.url) {
+            safelySendMessage({
+                action: 'START_MUSIC',
+                url: track.url,
+                volume: settings.focusMusicVolume
+            });
+        }
+    } else {
+        // If prep or disabled, ensure it stops
+        safelySendMessage({ action: 'STOP_MUSIC' });
+    }
+    // Cleanup is handled by App logic when session changes state or ends.
+    // We re-run this if focus mode changes, or music settings change.
+  }, [isFocus, settings.focusMusicEnabled, settings.focusMusicTrack]);
+
+  // Volume updates
+  useEffect(() => {
+      if (settings.focusMusicEnabled && isFocus) {
+        safelySendMessage({
+            action: 'UPDATE_VOLUME',
+            volume: settings.focusMusicVolume
+        });
+      }
+  }, [settings.focusMusicVolume, isFocus, settings.focusMusicEnabled]);
+
+  // Completion Logic
   useEffect(() => {
     if (secondsLeft <= 0) {
-      onComplete();
+        onComplete();
     }
   }, [secondsLeft, onComplete]);
 
   const totalSeconds = (session.endTime - session.startTime) / 1000;
   const growthPercentage = 1 - (secondsLeft / totalSeconds);
-  const isPrep = session.state === SessionState.PREP;
 
   return (
     <div className="view-scroll no-nav items-center justify-center animate-in relative overflow-hidden" style={{paddingBottom: '20px'}}>
       
-      {/* Background Ambient Plant - Inline styles for safety */}
+      {/* Background Ambient Plant */}
       <div 
         className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
         style={{ 
@@ -40,7 +92,7 @@ export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, onCom
         }}
       >
         <div style={{ width: '100%', height: '100%', transform: 'scale(1.5)', filter: 'blur(4px)' }}>
-            <PlantIcon growth={growthPercentage} className="w-full h-full opacity-30" />
+            <PlantIcon growth={growthPercentage} className="w-full h-full opacity-30" style={{width: '100%', height: '100%'}} />
         </div>
       </div>
 
@@ -57,9 +109,14 @@ export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, onCom
         <h1 className="timer-huge">{timeLeftFormatted}</h1>
         
         {!isPrep && !confirmGiveUp && (
-           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mt-4">
-             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-             <span className="text-xs text-white tracking-wide opacity-80">Cultivando planta</span>
+           <div className="flex flex-col items-center gap-2 mt-4">
+               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+                 <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                 <span className="text-xs text-white tracking-wide opacity-80">Cultivando planta</span>
+               </div>
+               {settings.focusMusicEnabled && (
+                   <span className="text-xs text-muted opacity-60">🎵 {FOCUS_MUSIC_TRACKS.find(t => t.id === settings.focusMusicTrack)?.name}</span>
+               )}
            </div>
         )}
       </div>

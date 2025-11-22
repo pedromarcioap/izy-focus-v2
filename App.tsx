@@ -1,6 +1,8 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, SessionState } from './types';
-import type { FocusList, BlockList, FocusSession, GardenPlant, CycleStat } from './types';
+import type { FocusList, BlockList, FocusSession, GardenPlant, CycleStat, UserSettings } from './types';
+import { DEFAULT_SETTINGS } from './constants';
 import { PopupView } from './views/PopupView';
 import { ActiveFocusView } from './views/ActiveFocusView';
 import { BreakView } from './views/BreakView';
@@ -8,6 +10,19 @@ import { OptionsView } from './views/OptionsView';
 import { DashboardView } from './views/DashboardView';
 import { TimerIcon, SettingsIcon, DashboardIcon } from './components/icons/NavigationIcons';
 import { storage } from './utils/storage';
+
+declare var chrome: any;
+
+// Helper for safe messaging
+const safelySendMessage = (message: any) => {
+  if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+    try {
+      chrome.runtime.sendMessage(message);
+    } catch (e) {
+      console.warn("Failed to send message:", e);
+    }
+  }
+};
 
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -19,6 +34,7 @@ const App: React.FC = () => {
   const [blockLists, setBlockLists] = useState<BlockList[]>([]);
   const [garden, setGarden] = useState<GardenPlant[]>([]);
   const [stats, setStats] = useState<CycleStat[]>([]);
+  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
 
   // Load data
   useEffect(() => {
@@ -29,6 +45,7 @@ const App: React.FC = () => {
         setBlockLists(data.blockLists);
         setGarden(data.garden);
         setStats(data.stats);
+        setSettings(data.settings);
         
         if (data.activeSession) {
           setActiveSession(data.activeSession);
@@ -64,6 +81,10 @@ const App: React.FC = () => {
       setBlockLists(lists);
       await storage.saveData('blockLists', lists);
   };
+  const updateSettings = async (newSettings: UserSettings) => {
+      setSettings(newSettings);
+      await storage.saveData('settings', newSettings);
+  };
 
   // --- Actions ---
   const startFocus = useCallback(async (list: FocusList, withPrep: boolean) => {
@@ -94,6 +115,10 @@ const App: React.FC = () => {
   
   const handleFocusComplete = useCallback(async () => {
     if (!activeSession) return;
+    
+    // Stop music when focus ends
+    safelySendMessage({ action: 'STOP_MUSIC' });
+    
     const now = Date.now();
     const newSession: FocusSession = {
         ...activeSession,
@@ -125,6 +150,7 @@ const App: React.FC = () => {
   const handleBreakComplete = useCallback(async () => {
     setActiveSession(null);
     await storage.setSession(null);
+    safelySendMessage({ action: 'CLOSE_OFFSCREEN' });
     setCurrentView(View.POPUP);
   }, []);
 
@@ -138,6 +164,11 @@ const App: React.FC = () => {
 
   const handleGiveUp = useCallback(async () => {
       if (!activeSession) return;
+      
+      // Stop any music immediately
+      safelySendMessage({ action: 'STOP_MUSIC' });
+      safelySendMessage({ action: 'CLOSE_OFFSCREEN' });
+
       const isPrep = activeSession.state === SessionState.PREP;
       if (!isPrep) {
         // Penalty
@@ -169,13 +200,13 @@ const App: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case View.ACTIVE_FOCUS:
-        if (activeSession) return <ActiveFocusView session={activeSession} onComplete={activeSession.state === SessionState.PREP ? handlePrepComplete : handleFocusComplete} onExtend={handleExtendFocus} onGiveUp={handleGiveUp} />;
+        if (activeSession) return <ActiveFocusView session={activeSession} settings={settings} onComplete={activeSession.state === SessionState.PREP ? handlePrepComplete : handleFocusComplete} onExtend={handleExtendFocus} onGiveUp={handleGiveUp} />;
         return null;
       case View.BREAK:
         if (activeSession) return <BreakView session={activeSession} onComplete={handleBreakComplete} />;
         return null;
       case View.OPTIONS:
-        return <OptionsView focusLists={focusLists} blockLists={blockLists} onSaveFocusLists={updateFocusLists} onSaveBlockLists={updateBlockLists} />;
+        return <OptionsView focusLists={focusLists} blockLists={blockLists} settings={settings} onSaveFocusLists={updateFocusLists} onSaveBlockLists={updateBlockLists} onSaveSettings={updateSettings} />;
       case View.DASHBOARD:
         return <DashboardView garden={garden} stats={stats} />;
       default:

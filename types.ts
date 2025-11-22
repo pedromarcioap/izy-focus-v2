@@ -27,6 +27,7 @@ export interface BlockList {
   id: string;
   name: string;
   sites: string[];
+  type: 'block' | 'allow';
 }
 
 export interface FocusSession {

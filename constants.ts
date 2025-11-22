@@ -18,9 +18,10 @@ export const COLORS = {
 };
 
 export const INITIAL_BLOCK_LISTS: BlockList[] = [
-  { id: 'bl1', name: 'Redes Sociais', sites: ['twitter.com', 'facebook.com', 'instagram.com', 'reddit.com'] },
-  { id: 'bl2', name: 'Notícias e Entretenimento', sites: ['youtube.com', 'netflix.com', 'cnn.com', 'g1.globo.com'] },
-  { id: 'bl3', name: 'Bloquear Tudo', sites: ['*'] },
+  { id: 'bl1', name: 'Redes Sociais', sites: ['twitter.com', 'facebook.com', 'instagram.com', 'reddit.com'], type: 'block' },
+  { id: 'bl2', name: 'Notícias e Entretenimento', sites: ['youtube.com', 'netflix.com', 'cnn.com', 'g1.globo.com'], type: 'block' },
+  { id: 'bl3', name: 'Bloquear Tudo', sites: ['*'], type: 'block' },
+  { id: 'wl1', name: 'Modo Trabalho (Permitidos)', sites: ['google.com', 'docs.google.com', 'notion.so', 'slack.com'], type: 'allow' },
 ];
 
 export const INITIAL_FOCUS_LISTS: FocusList[] = [

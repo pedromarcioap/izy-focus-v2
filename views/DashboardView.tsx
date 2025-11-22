@@ -30,11 +30,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) =
     }, [stats]);
 
     return (
-        <div className="page-container animate-in pb-20">
+        <div className="page-container animate-in">
             <h1 className="title-hero">Jardim</h1>
             
             {/* Stats Overview */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="grid grid-cols-2 gap-3">
                 <div className="card-glass flex flex-col items-center justify-center p-4 bg-primary/5 border-primary/20">
                     <span className="text-3xl font-bold text-primary">{alivePlants.length}</span>
                     <span className="text-xs text-muted uppercase tracking-wider mt-1">Vivas</span>
@@ -46,7 +46,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) =
             </div>
 
             {/* Garden Grid */}
-            <div className="mb-6">
+            <div>
                 <span className="text-label mb-2 px-1">Sua Coleção</span>
                 <div className="grid grid-cols-4 gap-2 p-3 rounded-xl bg-black/20 border border-dim max-h-48 overflow-y-auto">
                     {alivePlants.map(plant => (
@@ -63,18 +63,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) =
             </div>
 
             {/* AI Insight */}
-             <div className="card-glass mb-6 border-l-4 border-l-emerald-500 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" /></svg>
+             <div className="card-glass border-l-4 border-l-emerald-500 relative group">
+                <div className="absolute top-2 right-2 p-2 opacity-20 group-hover:opacity-40 transition-opacity pointer-events-none">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-emerald-400"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" /></svg>
                 </div>
                 <p className="text-xs uppercase font-bold text-emerald-400 mb-2 tracking-wide">Insight da IA</p>
-                <p className="text-sm text-white opacity-90 leading-relaxed italic">"{insight}"</p>
+                <p className="text-sm text-white opacity-90 leading-relaxed italic pr-14 break-words whitespace-pre-wrap">"{insight}"</p>
             </div>
 
             {/* Chart */}
-            <div className="h-48 mt-auto">
+            <div className="w-full flex flex-col">
                <span className="text-label mb-2 px-1">Performance Semanal</span>
-               <div className="w-full h-full card-glass p-2">
+               <div className="w-full h-48 card-glass p-2">
                    <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={stats}>
                         <XAxis 

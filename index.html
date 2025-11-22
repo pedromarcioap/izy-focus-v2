@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -84,7 +85,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       padding: 24px;
-      padding-bottom: calc(var(--nav-height) + 20px); /* Ensure content isn't hidden behind nav */
+      padding-bottom: calc(var(--nav-height) + 40px); /* Increased to 120px to clear floating nav completely */
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -347,6 +348,8 @@
     .right-0 { right: 0; }
     .top-1\/2 { top: 50%; }
     .right-4 { right: 1rem; }
+    .top-2 { top: 0.5rem; }
+    .right-2 { right: 0.5rem; }
     .-translate-y-1\/2 { transform: translateY(-50%); }
     .-translate-x-1\/2 { transform: translateX(-50%); }
 
@@ -388,10 +391,13 @@
     .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
     .pt-4 { padding-top: 1rem; }
     .pb-20 { padding-bottom: 5rem; }
+    .pr-4 { padding-right: 1rem; }
+    .pr-14 { padding-right: 3.5rem; }
 
     .gap-2 { gap: 0.5rem; }
     .gap-3 { gap: 0.75rem; }
     .gap-4 { gap: 1rem; }
+    .gap-5 { gap: 1.25rem; }
     .gap-6 { gap: 1.5rem; }
 
     /* Grid Specifics */
@@ -414,6 +420,8 @@
     .tracking-wider { letter-spacing: 0.05em; }
     .leading-relaxed { line-height: 1.5; }
     .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .break-words { overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; }
+    .whitespace-pre-wrap { white-space: pre-wrap; }
 
     /* Color Utilities */
     .text-primary { color: var(--primary); }
@@ -432,6 +440,8 @@
     .bg-black\/90 { background-color: rgba(0, 0, 0, 0.9); }
     .bg-warning\/10 { background-color: var(--warning-dim); }
     .bg-dim { background-color: rgba(0,0,0,0.5); }
+    .bg-primary-dim\/20 { background-color: rgba(52, 211, 153, 0.2); }
+    .bg-danger-dim\/20 { background-color: rgba(239, 68, 68, 0.2); }
 
     /* Borders */
     .border { border: 1px solid var(--border-subtle); }
@@ -452,7 +462,10 @@
     /* Effects */
     .shadow-lg { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); }
     .drop-shadow-lg { filter: drop-shadow(0 4px 3px rgba(0,0,0,0.3)); }
+    .opacity-10 { opacity: 0.1; }
+    .opacity-20 { opacity: 0.2; }
     .opacity-30 { opacity: 0.3; }
+    .opacity-40 { opacity: 0.4; }
     .opacity-50 { opacity: 0.5; }
     .opacity-60 { opacity: 0.6; }
     .opacity-80 { opacity: 0.8; }
@@ -470,6 +483,8 @@
 
     .animate-spin { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .transition-colors { transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+    .transition-opacity { transition: opacity 0.2s; }
 
     /* Hover Utilities */
     .hover\:bg-primary:hover { background-color: var(--primary); }
@@ -480,6 +495,7 @@
     .hover\:opacity-100:hover { opacity: 1; }
     .hover\:border-primary\/30:hover { border-color: rgba(52,211,153,0.3); }
     .group:hover .group-hover\:opacity-20 { opacity: 0.2; }
+    .group:hover .group-hover\:opacity-40 { opacity: 0.4; }
 
     /* Z-Index */
     .z-0 { z-index: 0; }

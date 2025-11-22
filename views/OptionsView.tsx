@@ -37,7 +37,7 @@ export const OptionsView: React.FC<OptionsViewProps> = ({
       setEditingFocusList(null);
   };
 
-  const createNewBlock = () => setEditingBlockList({ id: `bl_${Date.now()}`, name: '', sites: [] });
+  const createNewBlock = () => setEditingBlockList({ id: `bl_${Date.now()}`, name: '', sites: [], type: 'block' });
   const deleteBlock = (id: string) => { if(confirm('Remover?')) onSaveBlockLists(blockLists.filter(l => l.id !== id)); };
   const createNewFocus = () => setEditingFocusList({ id: `fl_${Date.now()}`, name: '', focusMinutes: 25, breakMinutes: 5, blockListId: blockLists[0]?.id || '' });
   const deleteFocus = (id: string) => { if(confirm('Remover?')) onSaveFocusLists(focusLists.filter(l => l.id !== id)); };
@@ -46,12 +46,35 @@ export const OptionsView: React.FC<OptionsViewProps> = ({
   if (editingBlockList) {
       return (
           <div className="view-scroll animate-in">
-              <h2 className="h1-hero">Editar Bloqueio</h2>
+              <h2 className="h1-hero">Editar Lista</h2>
               <form onSubmit={saveBlockList} className="flex flex-col gap-4 flex-1">
                   <div>
                     <label className="h2-section">Nome</label>
                     <input className="input-field" placeholder="Ex: Redes Sociais" value={editingBlockList.name} onChange={e => setEditingBlockList({...editingBlockList, name: e.target.value})} required autoFocus />
                   </div>
+                  
+                  <div>
+                    <label className="h2-section">Tipo de Lista</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div 
+                        className={`card card-interactive flex flex-col items-center p-3 border ${editingBlockList.type === 'block' ? 'border-danger bg-danger-dim/20' : 'border-subtle'}`}
+                        onClick={() => setEditingBlockList({...editingBlockList, type: 'block'})}
+                      >
+                         <span className="text-danger text-lg mb-1">⛔</span>
+                         <span className="text-xs font-bold text-white">Bloqueio</span>
+                         <span className="text-xs text-muted text-center mt-1">Bloqueia os sites listados</span>
+                      </div>
+                      <div 
+                        className={`card card-interactive flex flex-col items-center p-3 border ${editingBlockList.type === 'allow' ? 'border-primary bg-primary-dim/20' : 'border-subtle'}`}
+                        onClick={() => setEditingBlockList({...editingBlockList, type: 'allow'})}
+                      >
+                         <span className="text-primary text-lg mb-1">✅</span>
+                         <span className="text-xs font-bold text-white">Whitelist</span>
+                         <span className="text-xs text-muted text-center mt-1">Permite APENAS os sites listados</span>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex-1 flex flex-col">
                     <label className="h2-section">Sites (separados por vírgula)</label>
                     <textarea className="input-field flex-1" style={{resize: 'none', minHeight: '150px'}} placeholder="facebook.com, twitter.com" value={editingBlockList.sites.join(', ')} onChange={e => setEditingBlockList({...editingBlockList, sites: e.target.value.split(',').map(s => s.trim())})} />
@@ -85,9 +108,11 @@ export const OptionsView: React.FC<OptionsViewProps> = ({
                     </div>
                 </div>
                 <div>
-                    <label className="h2-section">Lista de Bloqueio</label>
+                    <label className="h2-section">Lista de Sites</label>
                     <select className="input-field" style={{appearance: 'none', color: editingFocusList.blockListId ? 'white' : 'gray'}} value={editingFocusList.blockListId} onChange={e => setEditingFocusList({...editingFocusList, blockListId: e.target.value})}>
-                        {blockLists.map(bl => <option key={bl.id} value={bl.id} style={{color:'#000'}}>{bl.name}</option>)}
+                        {blockLists.map(bl => <option key={bl.id} value={bl.id} style={{color:'#000'}}>
+                           {bl.type === 'allow' ? '✅ ' : '⛔ '} {bl.name}
+                        </option>)}
                     </select>
                 </div>
                 <div className="flex gap-3 mt-auto pt-4">
@@ -106,13 +131,20 @@ export const OptionsView: React.FC<OptionsViewProps> = ({
       
       <section>
         <div className="flex justify-between items-center mb-2">
-            <span className="h2-section mb-0">Listas de Bloqueio</span>
+            <span className="h2-section mb-0">Listas de Sites</span>
             <button onClick={createNewBlock} className="text-primary text-xs font-bold px-2 py-1 bg-primary-dim rounded hover:bg-primary hover:text-black transition-colors">+ NOVO</button>
         </div>
         <div className="flex flex-col gap-2">
             {blockLists.map(list => (
-                <div key={list.id} className="card card-interactive flex justify-between items-center group">
-                    <span className="font-medium text-sm text-white">{list.name}</span>
+                <div key={list.id} className="card card-interactive flex justify-between items-center group border-l-4" style={{borderLeftColor: list.type === 'allow' ? 'var(--primary)' : 'var(--danger)'}}>
+                    <div className="flex items-center gap-3">
+                        <div>
+                            <span className="font-medium text-sm text-white flex items-center gap-2">
+                                {list.name}
+                            </span>
+                            <div className="text-xs text-muted">{list.sites.length} sites • <span className={list.type === 'allow' ? 'text-primary' : 'text-danger'}>{list.type === 'allow' ? 'Whitelist' : 'Blocklist'}</span></div>
+                        </div>
+                    </div>
                     <div className="flex gap-2">
                         <button onClick={() => setEditingBlockList(list)} className="text-xs text-muted hover:text-white p-2">Editar</button>
                         <button onClick={() => deleteBlock(list.id)} className="text-xs text-danger hover:text-red-400 p-2">✕</button>
@@ -145,4 +177,3 @@ export const OptionsView: React.FC<OptionsViewProps> = ({
     </div>
   );
 };
-    

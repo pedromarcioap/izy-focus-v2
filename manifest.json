@@ -22,7 +22,7 @@
     "128": "icons/icon.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' https://aistudiocdn.com 'sha256-mL0ELLs4L5lrAUcdOyNLvvUSO2GQMurwDt9ftziO7pM='; object-src 'self'; style-src 'self' 'unsafe-inline'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' https://aistudiocdn.com 'sha256-mL0ELLs4L5lrAUcdOyNLvvUSO2GQMurwDt9ftziO7pM='; object-src 'self'; style-src 'self' 'unsafe-inline'"
   },
   "web_accessible_resources": [
     {

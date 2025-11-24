@@ -22,7 +22,7 @@
     "128": "icons/icon.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' https://cdn.freesound.org https://cdn.pixabay.com; connect-src 'self' https://generativelanguage.googleapis.com"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' 'nonce-2726c7f26c'; object-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' https://cdn.freesound.org https://cdn.pixabay.com; connect-src 'self' https://generativelanguage.googleapis.com"
   },
   "web_accessible_resources": [
     {

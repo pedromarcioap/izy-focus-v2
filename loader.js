@@ -1,1 +1,2 @@
-// This file is no longer used. Import map is handled via inline script in index.html with a CSP nonce.
+// Deprecated. Loader logic has been moved to index.html with a CSP nonce.
+// This file can be safely deleted or ignored.

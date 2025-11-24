@@ -22,7 +22,7 @@
     "128": "icons/icon.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' 'sha256-mL0ELLs4L5lrAUcdOyNLvvUSO2GQMurwDt9ftziO7pM='; object-src 'self'; style-src 'self' 'unsafe-inline'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' https://cdn.freesound.org https://cdn.pixabay.com"
   },
   "web_accessible_resources": [
     {

@@ -26,7 +26,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["assets/*", "icons/*", "app.css", "offscreen.html", "offscreen.js"],
+      "resources": ["assets/*", "icons/*", "app.css", "offscreen.html", "offscreen.js", "libs/*"],
       "matches": ["<all_urls>"]
     }
   ]

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from '../libs/deps.js';
 
 export const useTimer = (targetEndTime: number) => {
   const calculateTimeLeft = () => {
@@ -30,9 +30,6 @@ export const useTimer = (targetEndTime: number) => {
   return { 
     timeLeftFormatted: `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
     secondsLeft,
-    // In this new version, 'isRunning' is implied by secondsLeft > 0 and the existence of a session
     isRunning: secondsLeft > 0, 
-    // Start/Pause/Reset are handled by the App logic updating the 'targetEndTime' in storage, 
-    // so we don't export them here to avoid conflicting truth sources.
   };
 };

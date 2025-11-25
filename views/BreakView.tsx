@@ -1,5 +1,4 @@
-
-import React, { useEffect, useMemo } from 'react';
+import { React, useEffect, useMemo } from '../libs/deps.js';
 import type { FocusSession } from '../types';
 import { useTimer } from '../hooks/useTimer';
 import { MICRO_BREAK_SUGGESTIONS } from '../constants';
@@ -10,12 +9,12 @@ interface BreakViewProps {
   onComplete: () => void;
 }
 
-export const BreakView: React.FC<BreakViewProps> = ({ session, onComplete }) => {
+export const BreakView = ({ session, onComplete }: BreakViewProps) => {
   const { timeLeftFormatted, secondsLeft } = useTimer(session.endTime);
   const suggestion = useMemo(() => MICRO_BREAK_SUGGESTIONS[Math.floor(Math.random() * MICRO_BREAK_SUGGESTIONS.length)], []);
 
   useEffect(() => {
-    // Sound logic remains same
+    // Sound logic
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     if (audioContext) {
         const o = audioContext.createOscillator();

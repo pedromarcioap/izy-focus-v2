@@ -1,13 +1,13 @@
-
-import React from 'react';
+import { React } from '../../libs/deps.js';
 
 interface PlantIconProps {
   growth: number; // 0 to 1
   className?: string;
   status?: 'alive' | 'withered';
+  style?: any;
 }
 
-export const PlantIcon: React.FC<PlantIconProps> = ({ growth, className, status = 'alive' }) => {
+export const PlantIcon = ({ growth, className, status = 'alive', style }: PlantIconProps) => {
   const stage = Math.min(Math.floor(growth * 5), 4);
   const isWithered = status === 'withered';
   
@@ -44,7 +44,7 @@ export const PlantIcon: React.FC<PlantIconProps> = ({ growth, className, status 
   ];
 
   return (
-    <svg viewBox="0 0 16 20" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 16 20" className={className} style={style} fill="none" xmlns="http://www.w3.org/2000/svg">
       {pot}
       <g style={{ transition: 'all 0.5s ease-in-out' }}>
         {stages[stage]}

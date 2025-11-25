@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import { React, useState } from '../libs/deps.js';
 import type { FocusList } from '../types';
 import { Button } from '../components/common/Button';
 
@@ -8,8 +7,8 @@ interface PopupViewProps {
   onStartFocus: (list: FocusList, withPrep: boolean) => void;
 }
 
-export const PopupView: React.FC<PopupViewProps> = ({ focusLists, onStartFocus }) => {
-  const [selectedListId, setSelectedListId] = useState<string>(focusLists[0]?.id || '');
+export const PopupView = ({ focusLists, onStartFocus }: PopupViewProps) => {
+  const [selectedListId, setSelectedListId] = useState(focusLists[0]?.id || '');
   const [usePrepTimer, setUsePrepTimer] = useState(false);
 
   const selectedList = focusLists.find(l => l.id === selectedListId);
@@ -98,4 +97,3 @@ export const PopupView: React.FC<PopupViewProps> = ({ focusLists, onStartFocus }
     </div>
   );
 };
-    

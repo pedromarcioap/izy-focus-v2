@@ -1,21 +1,22 @@
-import React from 'react';
+import { React } from '../../libs/deps.js';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface ButtonProps {
+  children?: any;
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  [key: string]: any;
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
+export const Button = ({ 
   children, 
   variant = 'primary', 
   size = 'md',
   className = '', 
   ...props 
-}) => {
+}: ButtonProps) => {
   const baseClass = 'btn';
-  const variantClass = `btn-${variant === 'secondary' ? 'ghost' : variant}`; // secondary aliases to ghost for now
+  const variantClass = `btn-${variant === 'secondary' ? 'ghost' : variant}`; 
   const sizeClass = `btn-${size}`;
 
   return (

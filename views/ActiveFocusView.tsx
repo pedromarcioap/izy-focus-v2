@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import { React, useEffect, useState } from '../libs/deps.js';
 import { SessionState } from '../types';
 import type { FocusSession, UserSettings } from '../types';
 import { useTimer } from '../hooks/useTimer';
@@ -30,7 +29,7 @@ const safelySendMessage = (message: any) => {
   }
 };
 
-export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, settings, onComplete, onExtend, onGiveUp }) => {
+export const ActiveFocusView = ({ session, settings, onComplete, onExtend, onGiveUp }: ActiveFocusViewProps) => {
   const { timeLeftFormatted, secondsLeft } = useTimer(session.endTime);
   const [confirmGiveUp, setConfirmGiveUp] = useState(false);
 
@@ -40,7 +39,6 @@ export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, setti
   // --- Music Logic (Offscreen Delegation) ---
   useEffect(() => {
     // Only attempt to play music if we are officially in focus mode.
-    // We removed secondsLeft from dependencies to avoid spamming the background script every second.
     if (settings.focusMusicEnabled && isFocus) {
         const track = FOCUS_MUSIC_TRACKS.find(t => t.id === settings.focusMusicTrack);
         if (track && track.url) {
@@ -54,8 +52,6 @@ export const ActiveFocusView: React.FC<ActiveFocusViewProps> = ({ session, setti
         // If prep or disabled, ensure it stops
         safelySendMessage({ action: 'STOP_MUSIC' });
     }
-    // Cleanup is handled by App logic when session changes state or ends.
-    // We re-run this if focus mode changes, or music settings change.
   }, [isFocus, settings.focusMusicEnabled, settings.focusMusicTrack]);
 
   // Volume updates

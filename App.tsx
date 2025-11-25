@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback, useEffect } from 'react';
+import { React, useState, useCallback, useEffect } from './libs/deps.js';
 import { View, SessionState } from './types';
 import type { FocusList, BlockList, FocusSession, GardenPlant, CycleStat, UserSettings } from './types';
 import { DEFAULT_SETTINGS } from './constants';
@@ -13,7 +12,6 @@ import { storage } from './utils/storage';
 
 declare var chrome: any;
 
-// Helper for safe messaging
 const safelySendMessage = (message: any) => {
   if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
     try {
@@ -24,19 +22,18 @@ const safelySendMessage = (message: any) => {
   }
 };
 
-const App: React.FC = () => {
+const App = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<View>(View.POPUP);
-  const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
+  const [loadError, setLoadError] = useState(null);
+  const [currentView, setCurrentView] = useState(View.POPUP);
+  const [activeSession, setActiveSession] = useState(null);
 
-  const [focusLists, setFocusLists] = useState<FocusList[]>([]);
-  const [blockLists, setBlockLists] = useState<BlockList[]>([]);
-  const [garden, setGarden] = useState<GardenPlant[]>([]);
-  const [stats, setStats] = useState<CycleStat[]>([]);
-  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+  const [focusLists, setFocusLists] = useState([]);
+  const [blockLists, setBlockLists] = useState([]);
+  const [garden, setGarden] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
-  // Load data
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -64,7 +61,6 @@ const App: React.FC = () => {
     loadData();
   }, []);
 
-  // --- Persist functions ---
   const updateGarden = async (newGarden: GardenPlant[]) => {
       setGarden(newGarden);
       await storage.saveData('garden', newGarden);
@@ -86,7 +82,6 @@ const App: React.FC = () => {
       await storage.saveData('settings', newSettings);
   };
 
-  // --- Actions ---
   const startFocus = useCallback(async (list: FocusList, withPrep: boolean) => {
     const now = Date.now();
     let newSession: FocusSession;
@@ -116,7 +111,6 @@ const App: React.FC = () => {
   const handleFocusComplete = useCallback(async () => {
     if (!activeSession) return;
     
-    // Stop music when focus ends
     safelySendMessage({ action: 'STOP_MUSIC' });
     
     const now = Date.now();
@@ -129,11 +123,9 @@ const App: React.FC = () => {
     setActiveSession(newSession);
     await storage.setSession(newSession);
 
-    // Add plant
     const newPlant: GardenPlant = { id: Date.now(), type: 'sapling', date: new Date().toISOString().split('T')[0], status: 'alive' };
     await updateGarden([...garden, newPlant]);
     
-    // Update stats
     const today = new Date().toISOString().split('T')[0];
     let updatedStats = [...stats];
     const existingIndex = updatedStats.findIndex(s => s.date === today);
@@ -164,17 +156,13 @@ const App: React.FC = () => {
 
   const handleGiveUp = useCallback(async () => {
       if (!activeSession) return;
-      
-      // Stop any music immediately
       safelySendMessage({ action: 'STOP_MUSIC' });
       safelySendMessage({ action: 'CLOSE_OFFSCREEN' });
 
       const isPrep = activeSession.state === SessionState.PREP;
       if (!isPrep) {
-        // Penalty
         const newPlant: GardenPlant = { id: Date.now(), type: 'sapling', date: new Date().toISOString().split('T')[0], status: 'withered' };
         await updateGarden([...garden, newPlant]);
-        // Stats
         const today = new Date().toISOString().split('T')[0];
         let updatedStats = [...stats];
         const existingIndex = updatedStats.findIndex(s => s.date === today);
@@ -190,7 +178,6 @@ const App: React.FC = () => {
       setCurrentView(View.POPUP);
   }, [activeSession, garden, stats]);
 
-  // Loading View
   if (!isLoaded || loadError) {
       return <div className="page-container justify-center items-center text-center">
           {loadError ? <p className="text-danger">{loadError}</p> : <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>}
@@ -214,7 +201,7 @@ const App: React.FC = () => {
     }
   };
 
-  const NavItem: React.FC<{view: View; icon: React.ReactNode;}> = ({view, icon}) => (
+  const NavItem = ({view, icon}: {view: View; icon: any;}) => (
     <button onClick={() => setCurrentView(view)} className={`nav-item ${currentView === view ? 'active' : ''}`}>
         {icon}
     </button>

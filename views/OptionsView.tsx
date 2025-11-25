@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import { React, useState } from '../libs/deps.js';
 import type { FocusList, BlockList, UserSettings } from '../types';
 import { NOTIFICATION_SOUNDS, FOCUS_MUSIC_TRACKS } from '../constants';
 import { Button } from '../components/common/Button';
@@ -13,15 +12,15 @@ interface OptionsViewProps {
   onSaveSettings: (settings: UserSettings) => void;
 }
 
-export const OptionsView: React.FC<OptionsViewProps> = ({
+export const OptionsView = ({
   focusLists, blockLists, settings, onSaveFocusLists, onSaveBlockLists, onSaveSettings
-}) => {
-  const [editingBlockList, setEditingBlockList] = useState<BlockList | null>(null);
-  const [editingFocusList, setEditingFocusList] = useState<FocusList | null>(null);
-  const [currentTab, setCurrentTab] = useState<'general' | 'lists'>('lists');
+}: OptionsViewProps) => {
+  const [editingBlockList, setEditingBlockList] = useState(null);
+  const [editingFocusList, setEditingFocusList] = useState(null);
+  const [currentTab, setCurrentTab] = useState('lists');
 
   // --- Helper Functions ---
-  const saveBlockList = (e: React.FormEvent) => {
+  const saveBlockList = (e: any) => {
     e.preventDefault();
     if (!editingBlockList) return;
     const newLists = [...blockLists];
@@ -31,7 +30,7 @@ export const OptionsView: React.FC<OptionsViewProps> = ({
     setEditingBlockList(null);
   };
   
-  const saveFocusList = (e: React.FormEvent) => {
+  const saveFocusList = (e: any) => {
       e.preventDefault();
       if (!editingFocusList) return;
       const newLists = [...focusLists];

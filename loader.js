@@ -1,1 +1,1 @@
-// File deprecated. Import map logic moved to index.html with nonce.
+// Deprecated. Logic moved to index.html using inline import map with CSP hash.

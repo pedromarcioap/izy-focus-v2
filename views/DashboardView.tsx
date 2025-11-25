@@ -1,8 +1,6 @@
-
-import React, { useState, useEffect } from 'react';
+import { React, useState, useEffect, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from '../libs/deps.js';
 import type { GardenPlant, CycleStat } from '../types';
 import { getAIInsights } from '../services/geminiService';
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { PlantIcon } from '../components/icons/PlantIcon';
 
 interface DashboardViewProps {
@@ -10,8 +8,36 @@ interface DashboardViewProps {
   stats: CycleStat[];
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) => {
-    const [insight, setInsight] = useState<string>('Conectando com a natureza...');
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="card p-3 shadow-lg" style={{ backgroundColor: '#18181b', borderColor: '#27272a', minWidth: '150px' }}>
+        <p className="text-xs font-bold text-muted mb-2 border-b border-subtle pb-1">{label}</p>
+        <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-xs text-white">Completos</span>
+                </div>
+                <span className="text-sm font-bold text-primary">{data.completed}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{backgroundColor: '#3f3f46'}}></div>
+                    <span className="text-xs text-muted">Interrompidos</span>
+                </div>
+                <span className="text-sm font-bold text-muted">{data.interrupted}</span>
+            </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+export const DashboardView = ({ garden, stats }: DashboardViewProps) => {
+    const [insight, setInsight] = useState('Conectando com a natureza...');
     
     const alivePlants = garden.filter(p => p.status === 'alive');
     const witheredPlants = garden.filter(p => p.status === 'withered');
@@ -26,7 +52,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) =
             }
         };
         fetchInsight();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stats]);
 
     return (
@@ -85,8 +110,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ garden, stats }) =
                             tickLine={false} 
                         />
                         <Tooltip 
+                            content={<CustomTooltip />}
                             cursor={{fill: 'rgba(255,255,255,0.05)'}} 
-                            contentStyle={{ backgroundColor: '#09090b', border: '1px solid #333', borderRadius: '8px', color: '#fff' }} 
                         />
                         <Bar dataKey="completed" fill="#34d399" radius={[4, 4, 0, 0]} stackId="a" />
                         <Bar dataKey="interrupted" fill="#3f3f46" radius={[4, 4, 0, 0]} stackId="a" />
